@@ -1,10 +1,16 @@
 #ifndef L2LOG_LOGGER_H
 #define L2LOG_LOGGER_H
 
-#include <bits/stdc++.h>
+#include <iostream>
+#include <string>
+#include <mutex>
+#include <fstream>
+#include <ctime>
+#include <chrono>
 
 // What time you want to set? UTC Time, Mountain Time, etc?
-// The default format of logger file should be csv because that can be analysed
+// What are the possible exceptions that can occur?
+// What guarantees do you provide?
 
 enum class PRIORITY {
     CRITICAL = 50,
@@ -17,16 +23,15 @@ enum class PRIORITY {
 
 class Logger {
 private:
-    std::string filename;
+    const std::string filename;
     bool console = true;
     bool persistent = false;
     bool log_datetime = false;
     std::mutex write_mutex;
     std::fstream file;
 
-    PRIORITY priority = PRIORITY::NOTSET; // logs that are less severe than priority will be ignored.
+    PRIORITY priority = PRIORITY::NOTSET;
     time_t timeptr = time(nullptr);
-    struct tm *curtime = nullptr;
 
 public:
     explicit Logger(const std::string &filename,
@@ -44,18 +49,31 @@ public:
 
     void add_timestamp(std::string &message) {
         if (log_datetime) {
+            message += ", ";
             message += asctime(localtime(&timeptr));
         }
         message += '\n';
     }
 
-    void log(std::string &log_message) {
+    template<class T>
+    T build_message(T &message) {
+        return message;
+    }
+
+    template<class T, class... Args>
+    auto build_message(T &message, Args...messages) {
+        return message + ", " + build_message(messages...);
+    }
+
+    template<class... Args>
+    void log(Args... messages) {
         if (priority > PRIORITY::NOTSET)
             return;
 
-        std::string message = "LOG, " + log_message + ", ";
-
+        std::string message = "LOG, " + build_message(messages...);
         add_timestamp(message);
+
+        std::unique_lock<std::mutex> file_lock(write_mutex);
 
         if (console) {
             std::cout << message;
@@ -66,15 +84,16 @@ public:
         }
     }
 
-    void debug(std::string &log_message) {
-        std::unique_lock<std::mutex> file_lock(write_mutex);
+    template<class... Args>
+    void debug(Args... messages) {
 
         if (priority > PRIORITY::DEBUG)
             return;
 
-        std::string message = "DEBUG, " + log_message + ", ";
-
+        std::string message = "DEBUG, " + build_message(messages...);
         add_timestamp(message);
+
+        std::unique_lock<std::mutex> file_lock(write_mutex);
 
         if (console) {
             std::cout << message;
@@ -85,15 +104,17 @@ public:
         }
     }
 
-    void info(std::string &log_message) {
-        std::unique_lock<std::mutex> file_lock(write_mutex);
+    template<class... Args>
+    void info(Args... messages) {
 
-        if (priority > PRIORITY::INFO)
+        if (priority > PRIORITY::INFO) {
             return;
+        }
 
-        std::string message = "INFO, " + log_message + ", ";
-
+        std::string message = "INFO, " + build_message(messages...);
         add_timestamp(message);
+
+        std::unique_lock<std::mutex> file_lock(write_mutex);
 
         if (console) {
             std::cout << message;
@@ -104,15 +125,16 @@ public:
         }
     }
 
-    void warning(std::string &log_message) {
-        std::unique_lock<std::mutex> file_lock(write_mutex);
+    template<class... Args>
+    void warning(Args... messages) {
 
         if (priority > PRIORITY::WARNING)
             return;
 
-        std::string message = "WARNING, " + log_message + ", ";
-
+        std::string message = "WARNING, " + build_message(messages...);
         add_timestamp(message);
+
+        std::unique_lock<std::mutex> file_lock(write_mutex);
 
         if (console) {
             std::cout << message;
@@ -123,15 +145,16 @@ public:
         }
     }
 
-    void error(std::string &log_message) {
-        std::unique_lock<std::mutex> file_lock(write_mutex);
+    template<class...Args>
+    void error(Args... messages) {
 
         if (priority > PRIORITY::ERROR)
             return;
 
-        std::string message = "ERROR, " + log_message + ", ";
-
+        std::string message = "ERROR, " + build_message(messages...);
         add_timestamp(message);
+
+        std::unique_lock<std::mutex> file_lock(write_mutex);
 
         if (console) {
             std::cout << message;
@@ -142,15 +165,16 @@ public:
         }
     }
 
-    void critical(std::string &log_message) {
-        std::unique_lock<std::mutex> file_lock(write_mutex);
+    template<class... Args>
+    void critical(Args... messages) {
 
         if (priority > PRIORITY::CRITICAL)
             return;
 
-        std::string message = "CRITICAL, " + log_message + ", ";
-
+        std::string message = "CRITICAL, " + build_message(messages...);
         add_timestamp(message);
+
+        std::unique_lock<std::mutex> file_lock(write_mutex);
 
         if (console) {
             std::cout << message;
