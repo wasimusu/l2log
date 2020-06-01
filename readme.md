@@ -2,6 +2,8 @@
 L2Log is a modern low-latency concurrent c++ based logger.
 
 ### Features
+* Header file only implementation. 
+Just include the header file in your project to get started.
 * Concurrent thread-safe logging
 * Logging member functions can take any number of arguments.
 * Easily discoverable method names

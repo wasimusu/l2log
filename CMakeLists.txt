@@ -3,4 +3,4 @@ project(l2log)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(l2log main.cpp logger.cpp)
+add_executable(l2log main.cpp logger.h)

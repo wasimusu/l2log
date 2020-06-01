@@ -1,9 +1,9 @@
 #include <iostream>
-#include "logger.cpp"
+#include "logger.h"
 
 using namespace std;
 
-void read_log(string& filename) {
+void read_log(string &filename) {
     ifstream file(filename, std::ios_base::in);
     if (!file) {
         throw ::runtime_error("Could not open the file " + filename + " for writing");

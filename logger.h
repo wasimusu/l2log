@@ -10,9 +10,14 @@
 #include <unordered_map>
 #include <atomic>
 
-// What time you want to set? UTC Time, Mountain Time, etc?
-// What are the possible exceptions that can occur?
-// What guarantees do you provide?
+/**
+ * Feature request
+ *
+ * What time you want to set? UTC Time, Mountain Time, etc?
+ * What are the possible exceptions that can occur?
+ * Accept time formatting function?
+ * What guarantees do you provide?
+ * */
 
 enum class PRIORITY {
     CRITICAL = 50,
@@ -36,7 +41,11 @@ private:
     time_t timeptr = time(nullptr);
 
 public:
-    explicit Logger(const std::string &filename,
+    /**
+     * @brief: default constructor of the logger
+     *
+     * */
+    explicit Logger(const std::string &filename = "",
                     bool console = true,
                     bool persistent = false,
                     bool log_datetime = true,
@@ -45,10 +54,20 @@ public:
                                                             persistent(persistent),
                                                             log_datetime(log_datetime) {
 
-        file.open(filename, std::ios_base::out | std::ios_base::app | std::ios_base::in);
-        if (!file) throw std::runtime_error("Failed to successfully read/open the file " + filename);
+        if (!console || !persistent) {
+            throw std::invalid_argument("both console and persistent can not be false");
+        }
+
+        if (persistent) {
+            file.open(filename, std::ios_base::out | std::ios_base::app | std::ios_base::in);
+            if (!file) throw std::runtime_error("Failed to successfully read/open the file " + filename);
+        }
     };
 
+    /**
+     * @brief: adds timestamp to the log message
+     * @param[&in] message: user log message
+     * */
     void add_timestamp(std::string &message) {
         if (log_datetime) {
             message += ", ";
@@ -57,11 +76,19 @@ public:
         message += '\n';
     }
 
+    /**
+     * @brief: Base case for variadic message construction.
+     * @param[in] message: user log message
+     * */
     template<class T>
     T build_message(T &message) {
         return message;
     }
 
+    /**
+     * @brief: Construct message from string variadic
+     * @param[in] message: user log message
+     * */
     template<class T, class... Args>
     auto build_message(T &message, Args...messages) {
         return message + ", " + build_message(messages...);
@@ -86,6 +113,11 @@ public:
 
     }
 
+    /**
+     * @brief: log memeber with minimum priority.
+     * @param[in] messages: user log message. supports any number of input argument of type string
+     * @returns: void
+     * */
     template<class... Args>
     void log(Args... messages) {
         if (priority > PRIORITY::NOTSET)
@@ -95,6 +127,11 @@ public:
         basic_log(message);
     }
 
+    /**
+     * @brief: logs message with debug priority.
+     * @param[in] messages: user log message. supports any number of input argument of type string
+     * @returns: void
+     * */
     template<class... Args>
     void debug(Args... messages) {
 
@@ -106,6 +143,11 @@ public:
         basic_log(message);
     }
 
+    /**
+     * @brief: logs message with info priority.
+     * @param[in] messages: user log message. supports any number of input argument of type string
+     * @returns: void
+     * */
     template<class... Args>
     void info(Args... messages) {
 
@@ -118,6 +160,11 @@ public:
         basic_log(message);
     }
 
+    /**
+     * @brief: logs message with warning priority.
+     * @param[in] messages: user log message. supports any number of input argument of type string
+     * @returns: void
+     * */
     template<class... Args>
     void warning(Args... messages) {
 
@@ -129,6 +176,11 @@ public:
         basic_log(message);
     }
 
+    /**
+     * @brief: logs message with error priority.
+     * @param[in] messages: user log message. supports any number of input argument of type string
+     * @returns: void
+     * */
     template<class...Args>
     void error(Args... messages) {
 
@@ -140,6 +192,11 @@ public:
         basic_log(message);
     }
 
+    /**
+     * @brief: logs message with critical priority.
+     * @param[in] messages: user log message. supports any number of input argument of type string
+     * @returns: void
+     * */
     template<class... Args>
     void critical(Args... messages) {
 
@@ -151,10 +208,24 @@ public:
         basic_log(message);
     }
 
+    /**
+     * @brief: Changes the priority of the logger.
+     * Only messages with priority higher than or equal to priority are logged.
+     *
+     * @param[in] priority: new value for PRIORITY for priority
+     * @returns: void
+     * */
     void set_priority(PRIORITY priority) {
         this->priority = priority;
     }
 
+    /**
+     * @brief: Changes the priority of the logger.
+     * Only messages with priority higher than or equal to priority are logged.
+     *
+     * @param[in] priority: new value for PRIORITY for priority
+     * @returns: void
+     * */
     auto get_priority() const {
         return priority;
     }
