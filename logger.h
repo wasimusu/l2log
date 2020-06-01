@@ -7,6 +7,8 @@
 #include <fstream>
 #include <ctime>
 #include <chrono>
+#include <unordered_map>
+#include <atomic>
 
 // What time you want to set? UTC Time, Mountain Time, etc?
 // What are the possible exceptions that can occur?
@@ -65,12 +67,11 @@ public:
         return message + ", " + build_message(messages...);
     }
 
-    template<class... Args>
-    void log(Args... messages) {
-        if (priority > PRIORITY::NOTSET)
-            return;
-
-        std::string message = "LOG, " + build_message(messages...);
+    /**
+     * @brief: Use thing to log messages after constructing the user log messages
+     * @param[in] message: user log message
+     * */
+    void basic_log(std::string &message) {
         add_timestamp(message);
 
         std::unique_lock<std::mutex> file_lock(write_mutex);
@@ -82,6 +83,16 @@ public:
         if (persistent) {
             file << message;
         }
+
+    }
+
+    template<class... Args>
+    void log(Args... messages) {
+        if (priority > PRIORITY::NOTSET)
+            return;
+
+        std::string message = "LOG, " + build_message(messages...);
+        basic_log(message);
     }
 
     template<class... Args>
@@ -91,17 +102,8 @@ public:
             return;
 
         std::string message = "DEBUG, " + build_message(messages...);
-        add_timestamp(message);
 
-        std::unique_lock<std::mutex> file_lock(write_mutex);
-
-        if (console) {
-            std::cout << message;
-        }
-
-        if (persistent) {
-            file << message;
-        }
+        basic_log(message);
     }
 
     template<class... Args>
@@ -112,17 +114,8 @@ public:
         }
 
         std::string message = "INFO, " + build_message(messages...);
-        add_timestamp(message);
 
-        std::unique_lock<std::mutex> file_lock(write_mutex);
-
-        if (console) {
-            std::cout << message;
-        }
-
-        if (persistent) {
-            file << message;
-        }
+        basic_log(message);
     }
 
     template<class... Args>
@@ -132,17 +125,8 @@ public:
             return;
 
         std::string message = "WARNING, " + build_message(messages...);
-        add_timestamp(message);
 
-        std::unique_lock<std::mutex> file_lock(write_mutex);
-
-        if (console) {
-            std::cout << message;
-        }
-
-        if (persistent) {
-            file << message;
-        }
+        basic_log(message);
     }
 
     template<class...Args>
@@ -152,17 +136,8 @@ public:
             return;
 
         std::string message = "ERROR, " + build_message(messages...);
-        add_timestamp(message);
 
-        std::unique_lock<std::mutex> file_lock(write_mutex);
-
-        if (console) {
-            std::cout << message;
-        }
-
-        if (persistent) {
-            file << message;
-        }
+        basic_log(message);
     }
 
     template<class... Args>
@@ -172,17 +147,8 @@ public:
             return;
 
         std::string message = "CRITICAL, " + build_message(messages...);
-        add_timestamp(message);
 
-        std::unique_lock<std::mutex> file_lock(write_mutex);
-
-        if (console) {
-            std::cout << message;
-        }
-
-        if (persistent) {
-            file << message;
-        }
+        basic_log(message);
     }
 
     void set_priority(PRIORITY priority) {
