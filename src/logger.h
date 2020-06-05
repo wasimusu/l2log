@@ -54,7 +54,7 @@ public:
                                                             persistent(persistent),
                                                             log_datetime(log_datetime) {
 
-        if (!console || !persistent) {
+        if (!console && !persistent) {
             throw std::invalid_argument("both console and persistent can not be false");
         }
 
@@ -90,7 +90,7 @@ public:
      * @param[in] message: user log message
      * */
     template<class T, class... Args>
-    auto build_message(T &message, Args...messages) {
+    std::string build_message(T &message, Args...messages) {
         return message + ", " + build_message(messages...);
     }
 
@@ -226,8 +226,8 @@ public:
      * @param[in] priority: new value for PRIORITY for priority
      * @returns: void
      * */
-    auto get_priority() const {
-        return priority;
+    int get_priority() const {
+        return static_cast<int>(priority);
     }
 
     ~Logger() {
