@@ -19,8 +19,8 @@ void read_log(string &filename) {
 
 int main() {
     string filename = "log.csv";
-//    Logger logger(filename, false, true);
-//
+    Logger logger(filename, false, true);
+
 //    std::string first = "just random log";
 //    std::string error_message = "yo error message log";
 //

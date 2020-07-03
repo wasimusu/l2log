@@ -11,6 +11,7 @@
 #include <atomic>
 
 /**
+ * @file
  * Feature request
  *
  * What time you want to set? UTC Time, Mountain Time, etc?
@@ -42,7 +43,7 @@ private:
 
 public:
     /**
-     * @brief: default constructor of the logger
+     * @brief default constructor of the logger
      *
      * */
     explicit Logger(const std::string &filename = "",
@@ -65,7 +66,7 @@ public:
     };
 
     /**
-     * @brief: adds timestamp to the log message
+     * @brief adds timestamp to the log message
      * @param[&in] message: user log message
      * */
     void add_timestamp(std::string &message) {
@@ -77,7 +78,7 @@ public:
     }
 
     /**
-     * @brief: Base case for variadic message construction.
+     * @brief Base case for variadic message construction.
      * @param[in] message: user log message
      * */
     template<class T>
@@ -86,7 +87,7 @@ public:
     }
 
     /**
-     * @brief: Construct message from string variadic
+     * @brief Construct message from string variadic
      * @param[in] message: user log message
      * */
     template<class T, class... Args>
@@ -95,7 +96,7 @@ public:
     }
 
     /**
-     * @brief: Use thing to log messages after constructing the user log messages
+     * @brief Use thing to log messages after constructing the user log messages
      * @param[in] message: user log message
      * */
     void basic_log(std::string &message) {
@@ -114,7 +115,7 @@ public:
     }
 
     /**
-     * @brief: log memeber with minimum priority.
+     * @brief log memeber with minimum priority.
      * @param[in] messages: user log message. supports any number of input argument of type string
      * @returns: void
      * */
@@ -128,7 +129,7 @@ public:
     }
 
     /**
-     * @brief: logs message with debug priority.
+     * @brief logs message with debug priority.
      * @param[in] messages: user log message. supports any number of input argument of type string
      * @returns: void
      * */
@@ -144,7 +145,7 @@ public:
     }
 
     /**
-     * @brief: logs message with info priority.
+     * @brief logs message with info priority.
      * @param[in] messages: user log message. supports any number of input argument of type string
      * @returns: void
      * */
@@ -161,7 +162,7 @@ public:
     }
 
     /**
-     * @brief: logs message with warning priority.
+     * @brief logs message with warning priority.
      * @param[in] messages: user log message. supports any number of input argument of type string
      * @returns: void
      * */
@@ -177,7 +178,7 @@ public:
     }
 
     /**
-     * @brief: logs message with error priority.
+     * @brief logs message with error priority.
      * @param[in] messages: user log message. supports any number of input argument of type string
      * @returns: void
      * */
@@ -193,7 +194,7 @@ public:
     }
 
     /**
-     * @brief: logs message with critical priority.
+     * @brief logs message with critical priority.
      * @param[in] messages: user log message. supports any number of input argument of type string
      * @returns: void
      * */
@@ -209,7 +210,7 @@ public:
     }
 
     /**
-     * @brief: Changes the priority of the logger.
+     * @brief Changes the priority of the logger.
      * Only messages with priority higher than or equal to priority are logged.
      *
      * @param[in] priority: new value for PRIORITY for priority
@@ -220,7 +221,7 @@ public:
     }
 
     /**
-     * @brief: Changes the priority of the logger.
+     * @brief Changes the priority of the logger.
      * Only messages with priority higher than or equal to priority are logged.
      *
      * @param[in] priority: new value for PRIORITY for priority
